@@ -19,7 +19,6 @@ class ConsoleProtocolParser implements ParserInterface
     {
         // TODO: Implement decode() method.
         $data = trim($raw);
-        var_dump($data);
         $arr = explode(" ",$data);
         $caller = new Caller();
         $caller->setAction(array_shift($arr));
