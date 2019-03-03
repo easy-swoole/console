@@ -13,12 +13,17 @@ use EasySwoole\Socket\AbstractInterface\Controller;
 
 class ConsoleTcpController extends Controller
 {
-    /**
-     * 控制器本身不再处理任何实体action
-     * 全部转发给对应注册的命令处理器进行处理
-     * @param null|string $actionName
-     * @author: eValor < master@evalor.cn >
-     */
+    protected function onRequest(?string $actionName): bool
+    {
+        $events = OnRequestEvent::getInstance()->list();
+        foreach ($events as $event){
+            if(call_user_func($event,$this->caller()) === false){
+                return false;
+            }
+        }
+        return true;
+    }
+
     protected function actionNotFound(?string $actionName)
     {
         ModuleContainer::getInstance()->hook($actionName, $this->caller(), $this->response());

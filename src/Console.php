@@ -11,7 +11,6 @@ namespace EasySwoole\Console;
 
 use EasySwoole\Component\Singleton;
 use EasySwoole\Console\DefaultModule\Help;
-use EasySwoole\Console\DefaultModule\Server;
 use EasySwoole\Socket\Dispatcher;
 use Swoole\Server\Port;
 use EasySwoole\Socket\Config as DispatcherConfig;
@@ -26,7 +25,6 @@ class Console
     final function __construct()
     {
         ModuleContainer::getInstance()->set(new Help());
-        ModuleContainer::getInstance()->set(new Server());
     }
 
     /**
