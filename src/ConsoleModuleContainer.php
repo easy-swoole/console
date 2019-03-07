@@ -13,7 +13,7 @@ use EasySwoole\Component\Singleton;
 use EasySwoole\Socket\Bean\Caller;
 use EasySwoole\Socket\Bean\Response;
 
-class ModuleContainer
+class ConsoleModuleContainer
 {
     use Singleton;
     private $container = [];
@@ -41,7 +41,7 @@ class ModuleContainer
 
     function hook($actionName, Caller $caller, Response $response)
     {
-        $call = ModuleContainer::getInstance()->get($actionName);
+        $call = ConsoleModuleContainer::getInstance()->get($actionName);
         if ($call instanceof ModuleInterface) {
             $call->exec($caller, $response);
         } else {

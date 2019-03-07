@@ -9,7 +9,7 @@
 namespace EasySwoole\Console\DefaultModule;
 
 
-use EasySwoole\Console\ModuleContainer;
+use EasySwoole\Console\ConsoleModuleContainer;
 use EasySwoole\Console\ModuleInterface;
 use EasySwoole\Socket\Bean\Caller;
 use EasySwoole\Socket\Bean\Response;
@@ -22,7 +22,6 @@ class Help implements ModuleInterface
         return 'help';
     }
 
-
     public function exec(Caller $caller, Response $response)
     {
         $args = $caller->getArgs();
@@ -30,7 +29,7 @@ class Help implements ModuleInterface
             $this->help($caller, $response);
         } else {
             $actionName = $args[0];
-            $call = ModuleContainer::getInstance()->get($actionName);
+            $call = ConsoleModuleContainer::getInstance()->get($actionName);
             if ($call instanceof ModuleInterface) {
                 $call->help($caller, $response);
             } else {
@@ -41,7 +40,7 @@ class Help implements ModuleInterface
 
     public function help(Caller $caller, Response $response)
     {
-        $allCommand = implode(PHP_EOL, ModuleContainer::getInstance()->getCommandList());
+        $allCommand = implode(PHP_EOL, ConsoleModuleContainer::getInstance()->getCommandList());
         $help = <<<HELP
 
 欢迎使用EASYSWOOLE远程控制台!

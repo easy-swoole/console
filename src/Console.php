@@ -24,7 +24,7 @@ class Console
 
     final function __construct()
     {
-        ModuleContainer::getInstance()->set(new Help());
+        ConsoleModuleContainer::getInstance()->set(new Help());
     }
 
     /**
