@@ -11,7 +11,7 @@ namespace EasySwoole\Console;
 
 use EasySwoole\Component\Singleton;
 
-class OnRequestEvent
+class ConsoleInterceptor
 {
     use Singleton;
 

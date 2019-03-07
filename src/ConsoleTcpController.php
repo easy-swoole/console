@@ -15,9 +15,9 @@ class ConsoleTcpController extends Controller
 {
     protected function onRequest(?string $actionName): bool
     {
-        $events = OnRequestEvent::getInstance()->list();
+        $events = ConsoleInterceptor::getInstance()->list();
         foreach ($events as $event){
-            if(call_user_func($event,$this->caller()) === false){
+            if(call_user_func($event,$this->caller(),$this->response()) === false){
                 return false;
             }
         }
