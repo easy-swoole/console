@@ -43,10 +43,10 @@ class Help implements ModuleInterface
         $allCommand = implode(PHP_EOL, ConsoleModuleContainer::getInstance()->getCommandList());
         $help = <<<HELP
 
-欢迎使用EASYSWOOLE远程控制台!
-用法: 命令 [命令参数]
-
-请使用 help [命令名称] 获取某个命令的使用帮助，当前已注册的命令:
+Welcome to EasySwoole remote console
+Usage: command [action] [...arg] 
+For help: help [command] [...arg]
+Current command list:
 
 {$allCommand}
 
