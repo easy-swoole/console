@@ -50,9 +50,11 @@ class Console
         $server->on('receive', function (\swoole_server $server, $fd, $reactor_id, $data) use ($dispatcher) {
             $dispatcher->dispatch($server, $data, $fd, $reactor_id);
         });
-        $server->on('connect', function (\swoole_server $server, int $fd, int $reactorId) {
+        $server->on('connect', function (\swoole_server $server, int $fd, int $reactorId)use ($dispatcher) {
             $hello = 'Welcome to ' . $this->config->getServerName();
             $this->send($fd,$hello);
+            //连接成功,自动auth一次
+            $dispatcher->dispatch($server,'auth',$fd,$reactorId);
         });
     }
 
