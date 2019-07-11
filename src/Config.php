@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: yf
- * Date: 2019-02-25
- * Time: 15:46
- */
+
 
 namespace EasySwoole\Console;
 
@@ -13,26 +8,41 @@ use EasySwoole\Spl\SplBean;
 
 class Config extends SplBean
 {
-    protected $serverName = 'EasySwoole Console';
-
-    protected $listenPort = 9500;
-
-    protected $listenAddress = '127.0.0.1';
+    protected $name = 'EasyConsole';
+    protected $listenAddress = '0.0.0.0';
+    protected $listenPort = 9600;
+    protected $authKey = '';
 
     /**
      * @return string
      */
-    public function getServerName(): string
+    public function getName(): string
     {
-        return $this->serverName;
+        return $this->name;
     }
 
     /**
-     * @param string $serverName
+     * @param string $name
      */
-    public function setServerName(string $serverName): void
+    public function setName(string $name): void
     {
-        $this->serverName = $serverName;
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getListenAddress(): string
+    {
+        return $this->listenAddress;
+    }
+
+    /**
+     * @param string $listenAddress
+     */
+    public function setListenAddress(string $listenAddress): void
+    {
+        $this->listenAddress = $listenAddress;
     }
 
     /**
@@ -54,16 +64,17 @@ class Config extends SplBean
     /**
      * @return string
      */
-    public function getListenAddress(): string
+    public function getAuthKey(): string
     {
-        return $this->listenAddress;
+        return $this->authKey;
     }
 
     /**
-     * @param string $listenAddress
+     * @param string $authKey
      */
-    public function setListenAddress(string $listenAddress): void
+    public function setAuthKey(string $authKey): void
     {
-        $this->listenAddress = $listenAddress;
+        $this->authKey = $authKey;
     }
+
 }
