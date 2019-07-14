@@ -11,7 +11,7 @@ class Config extends SplBean
     protected $name = 'EasyConsole';
     protected $listenAddress = '0.0.0.0';
     protected $listenPort = 9600;
-    protected $authKey = '';
+    protected $authKey = 'easyswoole';
 
     /**
      * @return string
