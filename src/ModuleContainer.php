@@ -7,6 +7,7 @@ namespace EasySwoole\Console;
 class ModuleContainer
 {
     private $container = [];
+
     public function set(ModuleInterface $command)
     {
         $this->container[strtolower($command->moduleName())] = $command;

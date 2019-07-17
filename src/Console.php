@@ -12,6 +12,7 @@ class Console
     /** @var \swoole_server */
     protected $server;
     protected $table;
+    protected $moduleContainer;
 
     function __construct(Config $config)
     {
@@ -20,12 +21,19 @@ class Console
         $this->table->column('fd',Table::TYPE_INT,8);
         $this->table->column('isAuth',Table::TYPE_INT,1);
         $this->table->create();
+        $this->moduleContainer = new ModuleContainer();
+        $this->moduleContainer->set(new Help());
     }
 
     function attachToServer(\swoole_server $server):Console
     {
         $this->server = $server;
         return $this;
+    }
+
+    function moduleContainer():ModuleContainer
+    {
+        return $this->moduleContainer;
     }
 
 
@@ -47,8 +55,15 @@ class Console
             $arr = explode(" ",$data);
             $action = array_shift($arr);
             $args = $arr;
+            switch ($action){
+                default:
+                case 'help':{
+                    $call = $this->moduleContainer->get($action);
+                    break;
+                }
+            }
         });
-        $server->on('connect', function (\swoole_server $server, int $fd, int $reactorId)use ($dispatcher) {
+        $server->on('connect', function (\swoole_server $server, int $fd, int $reactorId){
             $hello = 'Welcome to ' . $this->config->getName();
             $this->send($fd,$hello);
         });
