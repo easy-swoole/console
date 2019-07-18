@@ -8,15 +8,17 @@ use Swoole\Table;
 
 class Console
 {
-    protected $config;
+    protected $serverName;
+    protected $authKey;
     /** @var \swoole_server */
     protected $server;
     protected $table;
     protected $moduleContainer;
 
-    function __construct(Config $config)
+    function __construct(string $serverName = 'easyswoole',string $authKey = 'easyswoole')
     {
-        $this->config = $config;
+        $this->serverName = $serverName;
+        $this->authKey = $authKey;
         $this->table = new Table(1024);
         $this->table->column('fd',Table::TYPE_INT,8);
         $this->table->column('isAuth',Table::TYPE_INT,1);
@@ -39,37 +41,95 @@ class Console
 
     /**
      * @param \swoole_server|\swoole_server_port $server
+     * @return Console
      */
-    function protocolSet($server)
+    function protocolSet($server):Console
     {
-        if($server instanceof \swoole_server){
-            $this->server = $server;
-            $server = $server->addlistener($this->config->getListenAddress(),$this->config->getListenPort(),SWOOLE_TCP);
-        }
         $server->set(array(
             "open_eof_split" => true,
             'package_eof' => "\r\n",
         ));
+
         $server->on('receive', function (\swoole_server $server, $fd, $reactor_id, $data){
+            $data = trim($data);
+            /*
+             * ctl+c
+             */
+            if('fff4fffd06' === bin2hex(substr($data,0,5))){
+                $this->send($fd,'Bye Bye !!!');
+                $this->server->close($fd);
+                return;
+            }
             $data = trim($data);
             $arr = explode(" ",$data);
             $action = array_shift($arr);
             $args = $arr;
+            $call = null;
             switch ($action){
-                default:
                 case 'help':{
                     $call = $this->moduleContainer->get($action);
-                    break;
+                    try{
+                        $msg = $call->exec($args,$fd,$this);
+                    }catch (\Throwable $throwable){
+                        $msg = "Error: {$throwable->getMessage()} at file {$throwable->getFile()} line {$throwable->getLine()}";
+                    }
+                    $this->send($fd,$msg);
+                    return;
+                }
+                case 'auth':{
+                    $password = array_shift($args);
+                    if($password == $this->authKey){
+                        $this->table->set($fd,[
+                            'fd'=>$fd,
+                            'isAuth'=>1
+                        ]);
+                        $msg = 'auth success';
+                    }else{
+                        $msg = 'auth fail';
+                    }
+                    $this->send($fd,$msg);
+                    return;
+                }
+                case 'exit':{
+                    $this->send($fd,'Bye Bye !!!');
+                    $this->server->close($fd);
+                    return;
+                }
+                default:{
+                    $call = $this->moduleContainer->get($action);
+                    if(!$this->table->get($fd)){
+                        $msg = 'please auth !!!';
+                        $this->send($fd,$msg);
+                        return;
+                    }
+                    if($call){
+                        try{
+                            $msg = $call->exec($args,$fd,$this);
+                        }catch (\Throwable $throwable){
+                            $msg = "Error: {$throwable->getMessage()} at file {$throwable->getFile()} line {$throwable->getLine()}";
+                        }
+                    }else{
+                        $msg = "{$action} not a register command";
+                    }
+                    $this->send($fd,$msg);
+                    return;
                 }
             }
         });
+
         $server->on('connect', function (\swoole_server $server, int $fd, int $reactorId){
-            $hello = 'Welcome to ' . $this->config->getName();
+            $hello = "Welcome to {$this->serverName} , please auth !!!";
             $this->send($fd,$hello);
         });
+
+        $server->on('close',function ($server, int $fd){
+            $this->table->del($fd);
+        });
+
+        return $this;
     }
 
-    public function send(string $msg,int $fd)
+    public function send(int $fd,string $msg)
     {
         if($this->server->getClientInfo($fd)){
             return $this->server->send($fd,$msg."\r\n");

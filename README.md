@@ -1,5 +1,6 @@
 ## Server
 ```
+
 $http = new swoole_http_server("127.0.0.1", 9501);
 
 $http->on("request", function ($request, $response) {
@@ -7,10 +8,13 @@ $http->on("request", function ($request, $response) {
     $response->end("Hello World\n");
 });
 
-$config = new \EasySwoole\Console\Config();
-\EasySwoole\Console\Console::getInstance()->attachServer($http,$config);
+$tcp = $http->addlistener('0.0.0.0',9600,SWOOLE_TCP);
+
+$console = new \EasySwoole\Console\Console();
+$console->protocolSet($tcp)->attachToServer($http);
 
 $http->start();
+
 
 ```
 
