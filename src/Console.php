@@ -46,7 +46,8 @@ class Console
     function protocolSet($server):Console
     {
         $server->set(array(
-            "open_eof_split" => true,
+            "open_eof_split" => false,
+            'open_eof_check'=>true,
             'package_eof' => "\r\n",
         ));
 
